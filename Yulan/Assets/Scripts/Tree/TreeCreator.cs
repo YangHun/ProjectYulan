@@ -24,17 +24,18 @@ public class TreeCreator : MonoBehaviour
   }
 
   void MakeBinTree (GameObject branch, int level) {
-    if (level > intensity) return;
+    if (level >= intensity) return;
 
     Vector3 start = branch.GetComponent<LineRenderer>().GetPosition(1);
-    
+    float weight = ( 1 - (float)level / intensity );
+
     GameObject left = new GameObject();
     left.transform.SetParent(branch.transform, false);
     LineRenderer ll = left.AddComponent<LineRenderer>();
-    ll.SetPosition(1, Vector3.up * duration);
+    ll.SetPosition(1, Vector3.up * duration * weight * Random.Range(1.0f, 2.0f));
     ll.material = this.mat;
     ll.useWorldSpace = false;
-    ll.widthMultiplier = this.width;
+    ll.widthMultiplier = this.width * weight;
     left.transform.localPosition = start;
     left.transform.Rotate(Vector3.forward * this.angle / 2.0f * -1);
     left.name = string.Format ("{0}_left", level);
@@ -44,10 +45,10 @@ public class TreeCreator : MonoBehaviour
     GameObject right = new GameObject();
     right.transform.SetParent(branch.transform, false);
     LineRenderer rl = right.AddComponent<LineRenderer>();
-    rl.SetPosition(1, Vector3.up * duration);
+    rl.SetPosition(1, Vector3.up * duration * weight * Random.Range(1.0f, 2.0f));
     rl.material = this.mat;
     rl.useWorldSpace = false;
-    rl.widthMultiplier = this.width;
+    rl.widthMultiplier = this.width * weight;
     right.transform.localPosition = start;
     right.transform.Rotate(Vector3.forward * this.angle / 2.0f);
     right.name = string.Format ("{0}_right", level);
