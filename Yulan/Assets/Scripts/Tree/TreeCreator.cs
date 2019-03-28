@@ -11,6 +11,10 @@ public class TreeCreator : MonoBehaviour
   public float width = 0.1f;
   public Material mat;
   private GameObject seed;
+
+
+  YulanTree tree;
+
   void Awake() {
     this.seed = new GameObject();
     LineRenderer line = this.seed.AddComponent<LineRenderer>();
@@ -20,7 +24,12 @@ public class TreeCreator : MonoBehaviour
     line.widthMultiplier = this.width;
     this.seed.name = "Seed";
 
-    this.MakeBinTree(seed, 0);
+    //this.MakeBinTree(seed, 0);
+
+
+
+    tree = new YulanTree(Vector3.up, intensity, duration, angle);
+    tree.MakeCompleteTree();
   }
 
   void MakeBinTree (GameObject branch, int level) {
@@ -37,7 +46,7 @@ public class TreeCreator : MonoBehaviour
     ll.useWorldSpace = false;
     ll.widthMultiplier = this.width * weight;
     left.transform.localPosition = start;
-    left.transform.Rotate(Vector3.forward * this.angle / 2.0f * -1);
+    left.transform.Rotate(Vector3.forward * this.angle / 2.0f * Random.Range(0.6f, 1.0f) * -1);
     left.name = string.Format ("{0}_left", level);
     
     this.MakeBinTree (left, level + 1);
@@ -50,10 +59,22 @@ public class TreeCreator : MonoBehaviour
     rl.useWorldSpace = false;
     rl.widthMultiplier = this.width * weight;
     right.transform.localPosition = start;
-    right.transform.Rotate(Vector3.forward * this.angle / 2.0f);
+    right.transform.Rotate(Vector3.forward * this.angle / 2.0f * Random.Range(0.6f, 1.0f));
     right.name = string.Format ("{0}_right", level);
 
     this.MakeBinTree (right, level + 1);
+  }
+
+
+  void OnRenderObject() {
+    mat.SetPass(0);
+    GL.PushMatrix();
+    GL.MultMatrix (transform.localToWorldMatrix);
+
+    GL.Begin(GL.LINES);
+    tree.RenderTree();
+    GL.End();
+    GL.PopMatrix();
   }
 
 }
