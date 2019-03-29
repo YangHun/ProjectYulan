@@ -5,6 +5,9 @@ using UnityEngine;
 namespace DevY.Yulan {
 public class TreeCreator : MonoBehaviour
 {
+
+  public Transform sun;
+  public float sun_intensity = 2.0f;
   public int intensity = 6;
   public int duration = 1;
   public float angle = 60.0f;
@@ -13,7 +16,7 @@ public class TreeCreator : MonoBehaviour
   private GameObject seed;
 
 
-  YulanTree tree;
+  YulanTree tree = null;
 
   void Awake() {
     this.seed = new GameObject();
@@ -28,7 +31,8 @@ public class TreeCreator : MonoBehaviour
 
 
 
-    tree = new YulanTree(Vector3.up, intensity, duration, angle);
+    tree = new YulanTree(Vector3.up, intensity, duration, angle, this.sun.forward, this.sun_intensity);
+    //tree = new YulanTree(Vector3.up, intensity, duration, angle, Vector3.zero);
     tree.MakeCompleteTree();
   }
 
@@ -67,11 +71,13 @@ public class TreeCreator : MonoBehaviour
 
 
   void OnRenderObject() {
+    if (tree==null) return;
     mat.SetPass(0);
     GL.PushMatrix();
     GL.MultMatrix (transform.localToWorldMatrix);
 
     GL.Begin(GL.LINES);
+
     tree.RenderTree();
     GL.End();
     GL.PopMatrix();

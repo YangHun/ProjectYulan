@@ -43,7 +43,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07af8eae622cee44bb952735f93ca9bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  intensity: 6
+  sun: {fileID: 0}
+  sun_intensity: 2.5
+  intensity: 7
   duration: 1
   angle: 60
   width: 0.1
