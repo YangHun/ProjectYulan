@@ -7,7 +7,7 @@ public class TreeCreator : MonoBehaviour
 {
 
   public Transform sun;
-  public float sun_intensity = 2.0f;
+  public float sun_intensity = 2.5f;
   public int intensity = 6;
   public int duration = 1;
   public float angle = 60.0f;
