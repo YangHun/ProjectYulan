@@ -76,10 +76,8 @@ public class TreeCreator : MonoBehaviour
     GL.PushMatrix();
     GL.MultMatrix (transform.localToWorldMatrix);
 
-    GL.Begin(GL.LINES);
-
     tree.RenderTree();
-    GL.End();
+    
     GL.PopMatrix();
   }
 
