@@ -38,27 +38,33 @@ public class YulanTree {
       //b.tree.nodes += 1;
       parent.child.Add (b);
       branches.Add(b);
+      if (b.level > this.intensity / 4.0f) this.Sprigging (b, 2, this.intensity - b.level);
       Branching (b, branches, childcount, complete);
       //Debug.LogFormat("branch {0}_{1} is created", b.level, parent.child.Count);
     }
   }
 
-  private void Sprigging () {
-
+  private void Sprigging (Branch b, int cc, float intensity) {
+    if (b.level >= this.intensity) return;
+    for (int i = 0; i < cc; i++) {
+      Branch s = new Sprig (b, b.weight * (1 - (float)b.level / this.intensity), cc, new Vector3 (this.light.x, this.light.y, this.light.z), this.light.w);
+      b.sprig.Add(s);
+      this.branches.Add(s);
+      Branching (s, this.branches, cc);
+    }
   }
 
   public void RenderTree () {
     
     this.Rendering();
     this.Blooming();
-    //this.Rendering(this.root);
-
+    
   }
 
   private void Rendering () {
     GL.Begin(GL.LINES);
     for (int i = 0; i < this.branches.Count; i++) {
-      GL.Color (Color.white);
+      GL.Color (this.branches[i].color);
       Vector3 src = this.branches[i].pos;
       Vector3 dst = this.branches[i].pos + this.branches[i].dir;
       GL.Vertex3 (src.x, src.y, src.z);
@@ -97,19 +103,24 @@ public class Branch {
   public float angle;
   public float length;
   public float weight;
+  public Color color;
+
+  public List <Branch> sprig;
 
   public Branch (Branch parent, float weight, int sibling, Vector3 light, float light_intensity) {
     this.parent = parent;
     this.level = parent.level + 1;
     this.weight = weight;
     this.child = new List<Branch>();
+    this.sprig = new List<Branch>();
     this.angle = parent.angle;
     this.length = parent.length;
+    this.color = Color.white;
     
     this.pos = parent.pos + parent.dir;
 
     //calc angle
-    this.dir = Quaternion.Euler(0.0f, 0.0f,  (-1 * (angle / 2.0f) + (this.angle / (sibling - 1) * (parent.child.Count))) * Random.Range(0.6f, 1.0f)) * (parent.dir);
+    this.dir = Quaternion.Euler(0.0f, 0.0f,  (-1 * (angle / 2.0f) + (this.angle / (sibling - 1) * parent.child.Count)) * Random.Range(0.6f, 1.0f)) * (parent.dir);
     if (light != Vector3.zero) {
       this.weight *= Mathf.Pow(Mathf.Cos(Vector3.Angle (this.dir, light * -1) / 2.0f * Mathf.PI / 180.0f), light_intensity);
     }
@@ -119,7 +130,7 @@ public class Branch {
     
     this.tree = parent.tree;
   }
-  
+
   // root branch
   public Branch (YulanTree tree, Vector3 direction, float length, float angle) {
     this.parent = null;
@@ -132,8 +143,33 @@ public class Branch {
     this.angle = angle;
     this.tree = tree;
   }
+}
 
+public class Sprig : Branch {
+  public Sprig (Branch parent, float weight, int sibling, Vector3 light, float light_intensity) : base (parent, weight, sibling, light, light_intensity) {
+    this.parent = parent;
+    this.level = parent.level + 1;
+    this.weight = weight;
+    this.child = new List<Branch>(); //assigned but not used now
+    this.sprig = new List<Branch>();
+    this.angle = parent.angle;
+    this.length = parent.length;
+    this.color = Color.green;
+    
+    this.pos = parent.pos + parent.dir * ((float)parent.sprig.Count / sibling);
 
+    //calc angle
+    this.dir = Quaternion.Euler(0.0f, 0.0f, this.angle / 2.0f * (parent.sprig.Count % 2 == 1?1:-1) * Random.Range(0.6f, 1.0f)) * (parent.dir);
+    if (light != Vector3.zero) {
+      this.weight *= Mathf.Pow(Mathf.Cos(Vector3.Angle (this.dir, light * -1) / 2.0f * Mathf.PI / 180.0f), light_intensity);
+    }
+    
+    this.dir = this.dir.normalized * this.length * this.weight * Random.Range(1.0f, 2.0f);
+    
+
+    
+    this.tree = parent.tree;
+  }
 }
 
 }
