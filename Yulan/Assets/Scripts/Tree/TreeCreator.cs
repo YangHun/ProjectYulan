@@ -15,8 +15,11 @@ public class TreeCreator : MonoBehaviour
   public Material mat;
   private GameObject seed;
 
-
   YulanTree tree = null;
+
+
+  // parameter
+  public bool showFlower = false;
 
   void Awake() {
     this.seed = new GameObject();
@@ -31,8 +34,8 @@ public class TreeCreator : MonoBehaviour
 
 
 
-    tree = new YulanTree(Vector3.up, intensity, duration, angle, this.sun.forward, this.sun_intensity);
-    //tree = new YulanTree(Vector3.up, intensity, duration, angle, Vector3.zero, 0.0f);
+    //tree = new YulanTree(Vector3.up, intensity, duration, angle, this.sun.forward, this.sun_intensity);
+    tree = new YulanTree(Vector3.up, intensity, duration, angle, Vector3.zero, 0.0f);
     tree.MakeCompleteTree();
   }
 
@@ -77,6 +80,7 @@ public class TreeCreator : MonoBehaviour
     GL.MultMatrix (transform.localToWorldMatrix);
 
     tree.RenderTree();
+    if (showFlower) tree.RenderFlower();
     
     GL.PopMatrix();
   }
