@@ -141,7 +141,7 @@ public class Branch {
     this.tree = parent.tree;
   }
 
-  // root branch
+  // trunk
   public Branch (YulanTree tree, Vector3 direction, float length, float angle) {
     this.parent = null;
     this.level = 0;
@@ -153,6 +153,12 @@ public class Branch {
     this.angle = angle;
     this.tree = tree;
     this.color = Color.white;
+
+
+    if (tree.light != Vector4.zero) {
+      this.weight *= ( 1 + Mathf.Pow(Mathf.Cos(Vector3.Angle (this.dir, (Vector3)tree.light * -1) / 2.0f * Mathf.PI / 180.0f), tree.light.z));
+    }
+    this.dir *= this.weight * Random.Range(1.0f, 2.0f);
   }
 }
 
