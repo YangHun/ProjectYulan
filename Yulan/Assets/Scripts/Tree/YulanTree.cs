@@ -79,8 +79,8 @@ public class YulanTree {
   }
 
   private void Blooming () {
-    float size = 0.1f;
-    GL.Begin(GL.TRIANGLES);
+    float size = 0.2f;
+    GL.Begin(GL.QUADS);
     for (int i = this.branches.Count - 1; i >= 0; i--) {
       if (this.branches[i].child.Count > 0) continue;
 
@@ -94,7 +94,9 @@ public class YulanTree {
       
       GL.Vertex3 (dst.x, dst.y, dst.z);
       GL.Vertex3 (dst.x + a.x + b.x, dst.y + a.y + b.y, dst.z + a.z + b.z);
+      GL.Vertex3 (dst.x + a.x * 2f, dst.y + a.y * 2f, dst.z + a.z * 2f);
       GL.Vertex3 (dst.x + a.x - b.x, dst.y + a.y - b.y, dst.z + a.z - b.z);
+      
     }
     GL.End();
   }
@@ -130,7 +132,7 @@ public class Branch {
     //calc angle
     this.dir = Quaternion.Euler(0.0f, 0.0f,  (-1 * (angle / 2.0f) + (this.angle / (sibling - 1) * parent.child.Count)) * Random.Range(0.6f, 1.0f)) * (parent.dir);
     if (light != Vector3.zero) {
-      this.weight *= Mathf.Pow(Mathf.Cos(Vector3.Angle (this.dir, light * -1) / 2.0f * Mathf.PI / 180.0f), light_intensity);
+      this.weight *= ( 1 + Mathf.Pow(Mathf.Cos(Vector3.Angle (this.dir, light * -1) / 2.0f * Mathf.PI / 180.0f), light_intensity));
     }
     
     this.dir = this.dir.normalized * this.length * this.weight * Random.Range(1.0f, 1.5f);
@@ -169,12 +171,12 @@ public class Sprig : Branch {
     this.pos = parent.pos + parent.dir * (((float)parent.sprig.Count + 1) / (sibling + 1));
 
     //calc angle
-    this.dir = Quaternion.Euler(0.0f, 0.0f, this.angle * (parent.sprig.Count % 2 == 1?1:-1) * Random.Range(0.6f, 0.8f)) * (parent.dir);
+    this.dir = Quaternion.Euler(0.0f, 0.0f, this.angle * (parent.sprig.Count % 2 == 1?1:-1) * Random.Range(0.6f, 1.0f)) * (parent.dir);
     if (light != Vector3.zero) {
-      this.weight *= Mathf.Pow(Mathf.Cos(Vector3.Angle (this.dir, light * -1) / 2.0f * Mathf.PI / 180.0f), light_intensity);
+      this.weight *= ( 0.5f + Mathf.Pow(Mathf.Cos(Vector3.Angle (this.dir, light * -1) / 2.0f * Mathf.PI / 180.0f), light_intensity));
     }
     
-    this.dir = this.dir.normalized * this.length * this.weight * Random.Range(1.0f, 2.0f);
+    this.dir = this.dir.normalized * this.length * this.weight * Random.Range(1.5f,1.8f);
     
 
     
