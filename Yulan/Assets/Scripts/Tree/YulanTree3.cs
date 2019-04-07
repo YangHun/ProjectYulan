@@ -31,8 +31,7 @@ public class YulanTree
 
   private void Branching (Branch parent, int childcount = 2, int sprigcount = 2) {
     if (parent.level >= this.intensity) return;
-    //int cc = Random.Range(1,childcount);
-    int cc = childcount;
+    int cc = parent.level >= 2? Random.Range (childcount - 1, childcount):childcount;
     float w = 1 - ((float)parent.level /(this.intensity + 1));
     for (int i = 0; i < cc; i++) {
       Branch b = new Branch (parent, cc, w );
@@ -126,7 +125,10 @@ public class YulanTree
       //Debug.LogFormat ("{0} th : s = {1}, d = {2}", i, s, d);
 
       Vector3 width = Quaternion.AngleAxis(90.0f, cam.transform.forward) * Vector3.ProjectOnPlane ( d - s , cam.transform.forward).normalized * w; 
-      GL.Color (Color.red + (Color.green) * ((float)i/level));
+      Color c = b.color;
+      //Color c = b.color - (Color.blue) * ((float)i/level);
+      //c.a = 1.0f;
+      GL.Color (c);
       GL.Vertex3 (s.x - width.x, s.y - width.y , s.z - width.z);
       GL.Vertex3 (d.x - width.x, d.y - width.y , d.z - width.z);
       GL.Vertex3 (d.x + width.x, d.y + width.y , d.z + width.z);
@@ -187,7 +189,7 @@ public class Branch {
     this.angle = parent.angle * 1.2f;
     this.length = parent.length;
     this.tree = parent.tree;
-    this.color = parent.color;
+    this.color= Color.white;
 
     this.pos = parent.pos + parent.dir;
 
@@ -249,7 +251,7 @@ public class Sprig : Branch {
     this.angle = parent.angle;
     this.length = parent.length;
     this.tree = parent.tree;
-    this.color = Color.green;
+    this.color = Color.cyan;
 
     this.pos = parent.pos + parent.dir * (((float)parent.sprig.Count + 1) / (childcount + 1));
 

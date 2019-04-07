@@ -223,11 +223,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa8c6f4ad5fd7bb4b86fe55d3ed19a96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  intensity: 4
-  angle: 60
+  intensity: 5
+  angle: 30
   length: 1
   child: 3
-  sprig: 2
+  sprig: 0
   mat: {fileID: 2100000, guid: 9639a5fe70cdab24f91f94f568ed9a96, type: 2}
   cam: {fileID: 975937054}
 --- !u!4 &1729417198
