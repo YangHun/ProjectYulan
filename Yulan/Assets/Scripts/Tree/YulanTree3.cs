@@ -74,6 +74,10 @@ public class YulanTree
     float w = 0.01f;    
     GL.Begin (GL.QUADS);
     for (int i = 0; i < this.branches.Count; i++){
+      
+      this.RenderSmoothStep (this.branches[i], cam, w, 7);
+      
+      /*
       GL.Color (this.branches[i].color);
       Vector3 src = (Vector3)(this.worldTransform.localToWorldMatrix * (this.branches[i].pos)) + this.worldTransform.position;
       Vector3 dst = (Vector3)(this.worldTransform.localToWorldMatrix * (this.branches[i].dir)) + src ;
@@ -83,10 +87,9 @@ public class YulanTree
       GL.Vertex3 (dst.x - width.x, dst.y - width.y , dst.z - width.z);
       GL.Vertex3 (dst.x + width.x, dst.y + width.y , dst.z + width.z);
       GL.Vertex3 (src.x + width.x, src.y + width.y , src.z + width.z);
-
+*/
     }
     GL.End();
-    
 
     //lines
     /*
@@ -101,6 +104,63 @@ public class YulanTree
     GL.End();
  */
  }
+
+
+  private void RenderSmoothStep (Branch b, Camera cam, float w, int level) {
+    Vector3 src = (Vector3)(this.worldTransform.localToWorldMatrix * (b.pos)) + this.worldTransform.position;
+    Vector3 dst = (Vector3)(this.worldTransform.localToWorldMatrix * (b.dir)) + src ;
+
+    Vector3 normal;
+    if (b.parent != null) normal = (Vector3)(this.worldTransform.localToWorldMatrix * (b.parent.dir.normalized));
+    else normal = Vector3.forward;
+
+    Vector3 alpha = (dst - src).magnitude * Mathf.Cos (Vector3.Angle (dst- src, normal)) * normal;
+    Vector3 beta = (dst - src) - alpha;
+    
+    //Debug.Log (alpha + " + " + beta + " =  " + (alpha + beta) );
+
+    for (int i = 1; i <= level ; i++) {
+      Vector3 s = src + ((float) (i-1) / level) * beta + (3 * Mathf.Pow ((float) (i-1) / level, 2) - 2 * Mathf.Pow ((float) (i-1) / level, 3) ) * alpha;
+      Vector3 d = src + ((float) (i) / level) * beta + (3 * Mathf.Pow ((float) (i) / level, 2) - 2 * Mathf.Pow ((float) (i) / level, 3) ) * alpha;
+
+      //Debug.LogFormat ("{0} th : s = {1}, d = {2}", i, s, d);
+
+      Vector3 width = Quaternion.AngleAxis(90.0f, cam.transform.forward) * Vector3.ProjectOnPlane ( d - s , cam.transform.forward).normalized * w; 
+      GL.Color (Color.red + (Color.green) * ((float)i/level));
+      GL.Vertex3 (s.x - width.x, s.y - width.y , s.z - width.z);
+      GL.Vertex3 (d.x - width.x, d.y - width.y , d.z - width.z);
+      GL.Vertex3 (d.x + width.x, d.y + width.y , d.z + width.z);
+      GL.Vertex3 (s.x + width.x, s.y + width.y , s.z + width.z);
+      
+    }
+    
+  }
+
+  private void RenderSmoothStep_0 (Branch b, Camera cam, float w, int level) {
+    Vector3 src = (Vector3)(this.worldTransform.localToWorldMatrix * (b.pos)) + this.worldTransform.position;
+    Vector3 dst = (Vector3)(this.worldTransform.localToWorldMatrix * (b.dir)) + src ;
+
+    Vector3[] dt = new Vector3[level];
+    dt[0] = src;
+    
+    for (int i = 1; i < level; i++) {
+      Vector3 d = (dst - src) * ( i / (float)(level - 1));
+      dt[i] = new Vector3 (d.x, 3 * Mathf.Pow (d.y, 2) - 2 * Mathf.Pow(d.y, 3) , d.z) + src;
+      //Debug.LogFormat ("{0},{1},{2},{3}", t, i, dt[i-1], dt[i]);
+
+      
+      Vector3 width = Quaternion.AngleAxis(90.0f, cam.transform.forward) * Vector3.ProjectOnPlane (dt[i] - dt[i-1], cam.transform.forward).normalized * w;
+
+
+      GL.Color (b.color);
+      GL.Vertex3 (dt[i-1].x - width.x, dt[i-1].y - width.y , dt[i-1].z - width.z);
+      GL.Vertex3 (dt[i].x - width.x, dt[i].y - width.y , dt[i].z - width.z);
+      GL.Vertex3 (dt[i].x + width.x, dt[i].y + width.y , dt[i].z + width.z);
+      GL.Vertex3 (dt[i-1].x + width.x, dt[i-1].y + width.y , dt[i-1].z + width.z);
+
+    }
+
+  }
 
 }
 
