@@ -10,12 +10,15 @@ public class YulanTree
   public float length;
   
   public Branch root;
+  public Transform worldTransform;
   public List<Branch> branches = new List<Branch>();
 
-  public YulanTree (Vector3 start, int intensity, float length, float angle) {
+  public YulanTree (Transform parent, Vector3 start, int intensity, float length, float angle) {
     this.intensity = intensity;
     this.length = length;
     this.angle = angle;
+
+    this.worldTransform = parent;
 
     this.root = new Branch(this, Vector3.up, length, angle);
     this.branches.Add(root);
@@ -72,14 +75,14 @@ public class YulanTree
     GL.Begin (GL.QUADS);
     for (int i = 0; i < this.branches.Count; i++){
       GL.Color (this.branches[i].color);
-      Vector3 src = this.branches[i].pos;
-      Vector3 dst = src + this.branches[i].dir;
-      Vector3 width = cam.transform.right * w;
+      Vector3 src = (Vector3)(this.worldTransform.localToWorldMatrix * (this.branches[i].pos)) + this.worldTransform.position;
+      Vector3 dst = (Vector3)(this.worldTransform.localToWorldMatrix * (this.branches[i].dir)) + src ;
+      Vector3 width = Quaternion.AngleAxis(90.0f, cam.transform.forward) * Vector3.ProjectOnPlane (dst - src, cam.transform.forward).normalized * w;
 
-      GL.Vertex3 (src.x - width.x, src.y - width.x , src.z - width.x);
-      GL.Vertex3 (dst.x - width.x, dst.y - width.x , dst.z - width.x);
-      GL.Vertex3 (dst.x + width.x, dst.y + width.x , dst.z + width.x);
-      GL.Vertex3 (src.x + width.x, src.y + width.x , src.z + width.x);
+      GL.Vertex3 (src.x - width.x, src.y - width.y , src.z - width.z);
+      GL.Vertex3 (dst.x - width.x, dst.y - width.y , dst.z - width.z);
+      GL.Vertex3 (dst.x + width.x, dst.y + width.y , dst.z + width.z);
+      GL.Vertex3 (src.x + width.x, src.y + width.y , src.z + width.z);
 
     }
     GL.End();
