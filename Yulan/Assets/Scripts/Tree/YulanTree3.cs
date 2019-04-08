@@ -13,12 +13,15 @@ public class YulanTree
   public Transform worldTransform;
   public List<Branch> branches = new List<Branch>();
 
-  public YulanTree (Transform parent, Vector3 start, int intensity, float length, float angle) {
+  public int smoothstep;
+
+  public YulanTree (Transform parent, Vector3 start, int intensity, float length, float angle, int smoothstep) {
     this.intensity = intensity;
     this.length = length;
     this.angle = angle;
 
     this.worldTransform = parent;
+    this.smoothstep = smoothstep;
 
     this.root = new Branch(this, Vector3.up, length, angle);
     this.branches.Add(root);
@@ -46,7 +49,7 @@ public class YulanTree
   private void Sprigging (Branch b, float weight, int childcount = 2, int sprigcount = 2) {
     if (b.level > this.intensity - 1 || b.level < 2) return;
     for (int i = 0; i < sprigcount; i++) {
-      Branch s = new Sprig (b, sprigcount, weight / 4.0f);
+      Branch s = new Sprig (b, sprigcount, weight / 1.5f);
       b.sprig.Add(s);
       this.branches.Add(s);
       Branching (s, childcount - 1, sprigcount);
@@ -69,13 +72,18 @@ public class YulanTree
 
   public void RenderTree(Camera cam) {
     
-     if (cam == null) return;
+    if (cam == null) return;
+
     float w = 0.01f;    
+
+
+    GL.PushMatrix();
     GL.Begin (GL.QUADS);
+
+    
     for (int i = 0; i < this.branches.Count; i++){
       
-      this.RenderSmoothStep (this.branches[i], cam, w, 7);
-      
+      this.RenderSmoothStep (this.branches[i], cam, w * 2 );            
       /*
       GL.Color (this.branches[i].color);
       Vector3 src = (Vector3)(this.worldTransform.localToWorldMatrix * (this.branches[i].pos)) + this.worldTransform.position;
@@ -89,7 +97,6 @@ public class YulanTree
 */
     }
     GL.End();
-
     //lines
     /*
         GL.Begin(GL.LINES);
@@ -102,10 +109,45 @@ public class YulanTree
     }
     GL.End();
  */
+ 
+    GL.PopMatrix();
  }
 
+  private void RenderSmoothStep (Branch b, Camera cam, float w) {
+    Vector3 src = (Vector3)(this.worldTransform.localToWorldMatrix * (b.pos)) + this.worldTransform.position;
+    Vector3 dst = (Vector3)(this.worldTransform.localToWorldMatrix * (b.dir)) + src ;
 
-  private void RenderSmoothStep (Branch b, Camera cam, float w, int level) {
+    float start = w * (1 - ((float)b.level / (this.intensity+2) ) ) ;
+    float end = w * (1 - ((float)(b.level + 1) / (this.intensity+2) ));;
+
+    for (int i = 1; i < b.smoothsteps.Length; i++) {
+      Vector3 s = src + (Vector3)(this.worldTransform.localToWorldMatrix * (b.smoothsteps[i - 1]));
+      Vector3 d = src + (Vector3)(this.worldTransform.localToWorldMatrix * (b.smoothsteps[i]));
+
+      Vector3 width = Quaternion.AngleAxis(90.0f, cam.transform.forward) * Vector3.ProjectOnPlane ( d - s , cam.transform.forward).normalized; 
+      
+      
+      Color c = b.color;
+      //Color c = b.color - (Color.blue) * ((float)i/level);
+      //c.a = 1.0f;
+      GL.Color (c);
+      GL.Vertex3 (s.x - width.x * Mathf.Lerp (start, end, (float) (i - 1) / b.smoothsteps.Length), 
+                  s.y - width.y * Mathf.Lerp (start, end, (float) (i - 1) / b.smoothsteps.Length),
+                  s.z - width.z * Mathf.Lerp (start, end, (float) (i - 1) / b.smoothsteps.Length));
+      GL.Vertex3 (d.x - width.x * Mathf.Lerp (start, end, (float) (i) / b.smoothsteps.Length),
+                  d.y - width.y * Mathf.Lerp (start, end, (float) (i) / b.smoothsteps.Length),
+                  d.z - width.z * Mathf.Lerp (start, end, (float) (i) / b.smoothsteps.Length));
+      GL.Vertex3 (d.x + width.x * Mathf.Lerp (start, end, (float) (i - 1) / b.smoothsteps.Length),
+                  d.y + width.y * Mathf.Lerp (start, end, (float) (i - 1) / b.smoothsteps.Length),
+                  d.z + width.z * Mathf.Lerp (start, end, (float) (i - 1) / b.smoothsteps.Length));
+      GL.Vertex3 (s.x + width.x * Mathf.Lerp (start, end, (float) (i) / b.smoothsteps.Length),
+                  s.y + width.y * Mathf.Lerp (start, end, (float) (i) / b.smoothsteps.Length),
+                  s.z + width.z * Mathf.Lerp (start, end, (float) (i) / b.smoothsteps.Length));
+    }
+    
+  }
+
+  private void RenderSmoothStep_0 (Branch b, Camera cam, float w, int level) {
     Vector3 src = (Vector3)(this.worldTransform.localToWorldMatrix * (b.pos)) + this.worldTransform.position;
     Vector3 dst = (Vector3)(this.worldTransform.localToWorldMatrix * (b.dir)) + src ;
 
@@ -138,7 +180,7 @@ public class YulanTree
     
   }
 
-  private void RenderSmoothStep_0 (Branch b, Camera cam, float w, int level) {
+  private void RenderSmoothStep_1 (Branch b, Camera cam, float w, int level) {
     Vector3 src = (Vector3)(this.worldTransform.localToWorldMatrix * (b.pos)) + this.worldTransform.position;
     Vector3 dst = (Vector3)(this.worldTransform.localToWorldMatrix * (b.dir)) + src ;
 
@@ -181,6 +223,8 @@ public class Branch {
 
   public float world_angle;
 
+  public Vector3[] smoothsteps;
+
   public Branch (Branch parent, int childcount, float weight) {
     this.parent = parent;
     this.level = parent.level + 1;
@@ -189,7 +233,9 @@ public class Branch {
     this.angle = parent.angle * 1.2f;
     this.length = parent.length;
     this.tree = parent.tree;
+    //this.color = parent.color;
     this.color= Color.white;
+    this.smoothsteps = new Vector3[this.tree.smoothstep + 1];
 
     this.pos = parent.pos + parent.dir;
 
@@ -198,9 +244,19 @@ public class Branch {
 
     this.dir = this.WorldDir (this, childcount) * weight;
 
-
+    this.smoothsteps = CalcSmoothStep (ref this.smoothsteps, this.dir, this.parent.dir);
     //this.dir = Quaternuion
 
+  }
+
+  protected Vector3[] CalcSmoothStep (ref Vector3[] array, Vector3 dir, Vector3 normal) {
+    Vector3 alpha = dir.magnitude * Mathf.Cos (Vector3.Angle(dir, normal)) * normal;
+    Vector3 beta = dir - alpha;
+    for (int i = 0; i < array.Length; i++) {
+      float dt = ((float)i / (array.Length - 1));
+      array[i] = dt * beta + (3 * Mathf.Pow(dt, 2) - 2 * Mathf.Pow(dt, 3)) * alpha;
+    }
+    return array;
   }
 
   protected Vector3 WorldDir (Branch b, int childcount) {
@@ -209,8 +265,8 @@ public class Branch {
     Vector3 normal = b.parent.dir.normalized;
     Vector3 target = b.dir;
 
-    if (childcount == 1)  return b.parent.dir.normalized;
-
+    if (b.level == 0) return b.parent.dir.normalized;
+    if (childcount == 1) return target; 
 
 
     if (b.parent.child.Count < 1) {
@@ -239,6 +295,9 @@ public class Branch {
     this.color = Color.white;
 
 
+    this.smoothsteps = new Vector3[this.tree.smoothstep + 1];
+    this.smoothsteps = CalcSmoothStep (ref this.smoothsteps, this.dir, Vector3.forward);
+
   }
 }
 
@@ -246,19 +305,23 @@ public class Branch {
 public class Sprig : Branch {
   public Sprig (Branch parent, int childcount, float weight) : base (parent, childcount, weight) {
     this.parent = parent;
-    this.level = parent.level;
+    this.level = parent.level + 1;
     this.child = new List<Branch>();
-    this.angle = parent.angle;
+    this.angle = parent.angle * 1.5f;
     this.length = parent.length;
     this.tree = parent.tree;
     this.color = Color.cyan;
 
-    this.pos = parent.pos + parent.dir * (((float)parent.sprig.Count + 1) / (childcount + 1));
+    this.smoothsteps = new Vector3[this.tree.smoothstep];
+    
+    this.pos = parent.pos + parent.smoothsteps [ (int) ( (float)(parent.sprig.Count + 1) / (childcount + 1) * (parent.smoothsteps.Length) ) ];
 
     
     this.dir = parent.dir;
     //this.dir = Quaternion.Euler(0.0f, 0.0f, ((angle / childcount)) ) * (parent.dir);
     this.dir = this.WorldDir (this, childcount)  * weight;
+
+    this.smoothsteps = CalcSmoothStep (ref this.smoothsteps, this.dir, this.parent.dir);
 
   }
 

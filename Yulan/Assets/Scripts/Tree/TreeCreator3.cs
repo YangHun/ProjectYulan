@@ -22,7 +22,7 @@ public class TreeCreator3 : MonoBehaviour
   // Start is called before the first frame update
   void Start()
   {
-    tree = new YulanTree(this.transform, Vector3.zero, this.intensity, this.length, this.angle);
+    tree = new YulanTree(this.transform, Vector3.zero, this.intensity, this.length, this.angle, 7);
 
     tree.MakeTree(this.child, this.sprig);
 
@@ -36,12 +36,12 @@ public class TreeCreator3 : MonoBehaviour
   void OnRenderObject() {
     if (tree==null) return;
     mat.SetPass(0);
-    GL.PushMatrix();
+    
     //GL.MultMatrix (transform.localToWorldMatrix);
     tree.RenderTree(this.cam);
     //if (showFlower) tree.RenderFlower();
     
-    GL.PopMatrix();
+    
   }
 
 }
