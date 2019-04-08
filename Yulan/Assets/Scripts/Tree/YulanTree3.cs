@@ -15,6 +15,7 @@ public class YulanTree
 
   public int smoothstep;
 
+
   public YulanTree (Transform parent, Vector3 start, int intensity, float length, float angle, int smoothstep) {
     this.intensity = intensity;
     this.length = length;
@@ -244,17 +245,26 @@ public class Branch {
 
     this.dir = this.WorldDir (this, childcount) * weight;
 
-    this.smoothsteps = CalcSmoothStep (ref this.smoothsteps, this.dir, this.parent.dir);
+    this.smoothsteps = CalcSmoothStep (ref this.smoothsteps, this.dir, this.parent.dir, 1);
     //this.dir = Quaternuion
 
   }
 
-  protected Vector3[] CalcSmoothStep (ref Vector3[] array, Vector3 dir, Vector3 normal) {
+  protected float SmoothStep (float value, int level) {
+    switch (level) {
+      case 0: return value;
+      case 1: return ( (-2) * Mathf.Pow(value, 3) + (3 * Mathf.Pow(value,2)));
+      case 2: return ( (6 * Mathf.Pow(value, 5) - 15 * Mathf.Pow(value, 4) + 10 * Mathf.Pow (value,3)));
+    }
+    return Mathf.Infinity * (-1);
+  }
+
+  protected Vector3[] CalcSmoothStep (ref Vector3[] array, Vector3 dir, Vector3 normal, int smoothstep) {
     Vector3 alpha = dir.magnitude * Mathf.Cos (Vector3.Angle(dir, normal)) * normal;
     Vector3 beta = dir - alpha;
     for (int i = 0; i < array.Length; i++) {
       float dt = ((float)i / (array.Length - 1));
-      array[i] = dt * beta + (3 * Mathf.Pow(dt, 2) - 2 * Mathf.Pow(dt, 3)) * alpha;
+      array[i] = dt * beta + SmoothStep (dt, smoothstep) * alpha;
     }
     return array;
   }
@@ -296,7 +306,7 @@ public class Branch {
 
 
     this.smoothsteps = new Vector3[this.tree.smoothstep + 1];
-    this.smoothsteps = CalcSmoothStep (ref this.smoothsteps, this.dir, Vector3.forward);
+    this.smoothsteps = CalcSmoothStep (ref this.smoothsteps, this.dir, Vector3.forward, 1);
 
   }
 }
@@ -321,7 +331,7 @@ public class Sprig : Branch {
     //this.dir = Quaternion.Euler(0.0f, 0.0f, ((angle / childcount)) ) * (parent.dir);
     this.dir = this.WorldDir (this, childcount)  * weight;
 
-    this.smoothsteps = CalcSmoothStep (ref this.smoothsteps, this.dir, this.parent.dir);
+    this.smoothsteps = CalcSmoothStep (ref this.smoothsteps, this.dir, this.parent.dir, 2);
 
   }
 
