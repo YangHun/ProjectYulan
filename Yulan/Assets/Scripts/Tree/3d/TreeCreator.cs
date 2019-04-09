@@ -20,6 +20,8 @@ public class TreeCreator : MonoBehaviour
   public Transform sun;
   public float sunIntensity = 8;
 
+  public Transform wind;
+
   YulanTree tree;
 
   // Start is called before the first frame update
@@ -29,6 +31,8 @@ public class TreeCreator : MonoBehaviour
 
     tree.MakeTree(this.child, this.sprig);
 
+
+    tree.Shaking (wind);
     
     Debug.Log ("cam.right:"+this.cam.transform.right);
 

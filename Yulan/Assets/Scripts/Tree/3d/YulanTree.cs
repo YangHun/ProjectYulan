@@ -19,7 +19,35 @@ public class YulanTree : MonoBehaviour
 
   public List<GameObject> objs = new List<GameObject>();
 
+  public Transform wind;
 
+  protected Coroutine shaking;
+  protected WaitForSeconds wait = new WaitForSeconds (1.0f);
+
+  #region Messages
+
+  public void Shaking(Transform wind) {
+    this.wind = wind;
+    this.shaking = StartCoroutine (ShakeTree());
+  }
+
+  private IEnumerator ShakeTree() {
+    float timer = 0.0f;
+    while (true) {
+      for (int i = 0; i < this.root.child.Count; i++ ){
+        this.root.child[i].rotation = Quaternion.AngleAxis ( Vector3.Angle(wind.forward, this.root.child[i].dir) ,this.root.transform.forward);
+        yield return null;
+
+      }
+    
+      timer += Time.fixedDeltaTime;
+    }
+  }
+
+  #endregion
+
+
+  #region Creation and Rendering
   public static YulanTree Create (Transform parent, Vector3 start, int intensity, float length, float angle, int smoothstep, Transform cam, Vector3 sun, float sunIntensity) {
     
     GameObject o = new GameObject("YulanTree");
@@ -163,5 +191,7 @@ public class YulanTree : MonoBehaviour
     }
     
   }
+
+  #endregion
 }
 }
