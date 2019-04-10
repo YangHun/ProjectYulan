@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace DevY.Yulan {
+namespace DevY.Yulan.Screen {
 
 public class YulanTree {
   public Vector4 light;

@@ -19,21 +19,30 @@ public class YulanTree : MonoBehaviour
 
   public List<GameObject> objs = new List<GameObject>();
 
+
+  public Vector3 top;
+
+
   public Transform wind;
 
   protected Coroutine shaking;
   protected WaitForSeconds wait = new WaitForSeconds (1.0f);
 
+
+  
+
+
+
   #region Messages
 
-  public void Shaking(Transform wind, float time) {
+  public void Shaking(Transform wind, float time, float intensity = 1) {
     this.wind = wind;
-    this.shaking = StartCoroutine (ShakeTree(time));
+    this.shaking = StartCoroutine (ShakeTree(time, intensity));
   }
 
-  private IEnumerator ShakeTree(float duration) {
+  private IEnumerator ShakeTree(float duration, float intensity = 1) {
     float timer = 0.0f;
-    float angle = Vector3.Angle (wind.forward, this.root.dir);
+    float angle = Vector3.Angle (wind.forward, this.root.dir) * intensity;
 
     angle = Mathf.Sin (angle);
     while (true) {
@@ -79,6 +88,8 @@ public class YulanTree : MonoBehaviour
     yulan.root = Branch.Create(yulan, parent.transform.up, length, angle, cam.right);
     yulan.branches.Add(yulan.root);
 
+    yulan.top = start;
+
     return yulan;
   }
 
@@ -95,6 +106,8 @@ public class YulanTree : MonoBehaviour
       Branch b = Branch.Create (parent, cc, w );
       parent.child.Add (b);
       this.branches.Add (b);
+
+      if ((b.pos + b.dir).y > this.top.y) this.top = b.pos + b.dir; 
 
       if (b.level > 0) this.Sprigging (b, w, childcount, sprigcount);
       Branching (b, childcount, sprigcount);

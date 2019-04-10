@@ -7,7 +7,7 @@ public class Sprig : Branch
 {
   new public static Sprig Create (Branch parent, int childcount, float weight) {
     
-    GameObject o = new GameObject("sprig");
+    GameObject o = new GameObject();
     Sprig s = o.AddComponent<Sprig>();
     o.transform.SetParent(parent.transform, false);
     
@@ -37,6 +37,8 @@ public class Sprig : Branch
 
     s.smoothsteps = s.CalcSmoothStep (ref s.smoothsteps, s.dir, s.parent.dir, 1);
     o.transform.position = s.pos;
+
+    o.name = string.Format ("{0}_{1}_sprig",s.level, s.parent.sprig.Count);
     return s;
   }
 

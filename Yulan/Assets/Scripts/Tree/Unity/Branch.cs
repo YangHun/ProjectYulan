@@ -25,26 +25,10 @@ public class Branch : MonoBehaviour
 
   private Vector3 normal; //for trunk
 
-  public Vector3 position {
-    get {
-      return this.pos;
-    }
-    set {
-      this.pos = value;
-    }
-  }
-
-  public Quaternion rotation {
-    set {
-      this.dir = value * this.dir;
-
-      this.smoothsteps = CalcSmoothStep (ref this.smoothsteps, this.dir, this.parent != null? this.parent.dir:this.normal, 1);
-    }
-  }
 
   public static Branch Create (Branch parent, int childcount, float weight) {
     
-    GameObject o = new GameObject ("branch");
+    GameObject o = new GameObject ();
     Branch b = o.AddComponent<Branch>();
     o.transform.SetParent(parent.transform, false);
 
@@ -76,6 +60,7 @@ public class Branch : MonoBehaviour
     //this.dir = Quaternuion
 
     o.transform.position = b.pos;
+    o.name = string.Format ("{0}_{1}_branch",b.level, b.parent.child.Count);
 
     return b;
 
@@ -125,7 +110,7 @@ public class Branch : MonoBehaviour
   // trunk
   public static Branch Create (YulanTree tree, Vector3 direction, float length, float angle, Vector3 normal) {
     
-    GameObject o = new GameObject("branch");
+    GameObject o = new GameObject("0_root");
     Branch b = o.AddComponent<Branch>();
 
     o.transform.SetParent(tree.transform, false);
