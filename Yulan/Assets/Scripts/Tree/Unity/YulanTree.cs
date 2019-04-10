@@ -42,9 +42,8 @@ public class YulanTree : MonoBehaviour
 
   private IEnumerator ShakeTree(float duration, float intensity = 1) {
     float timer = 0.0f;
-    float angle = Vector3.Angle (wind.forward, this.root.dir) * intensity;
-
-    angle = Mathf.Sin (angle);
+    float angle = Vector3.Angle (wind.forward, this.root.dir);
+    angle = Mathf.Sin (angle) * intensity;
     while (true) {
       if (timer > duration) timer = 0.0f;
       
