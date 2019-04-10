@@ -26,21 +26,32 @@ public class YulanTree : MonoBehaviour
 
   #region Messages
 
-  public void Shaking(Transform wind) {
+  public void Shaking(Transform wind, float time) {
     this.wind = wind;
-    this.shaking = StartCoroutine (ShakeTree());
+    this.shaking = StartCoroutine (ShakeTree(time));
   }
 
-  private IEnumerator ShakeTree() {
+  private IEnumerator ShakeTree(float duration) {
     float timer = 0.0f;
+    float angle = Vector3.Angle (wind.forward, this.root.dir);
+
+    angle = Mathf.Sin (angle);
     while (true) {
+      if (timer > duration) timer = 0.0f;
+      
       for (int i = 0; i < this.root.child.Count; i++ ){
-        this.root.child[i].rotation = Quaternion.AngleAxis ( Vector3.Angle(wind.forward, this.root.child[i].dir) ,this.root.transform.forward);
+
+        float a = (timer < duration / 2.0f)? angle * (duration / 2.0f) : (-1) * angle * (duration / 2.0f ) ; 
+
+        a *= Time.fixedDeltaTime;
+
+        this.root.child[i].transform.Rotate(wind.right, a);
         yield return null;
 
       }
     
       timer += Time.fixedDeltaTime;
+
     }
   }
 

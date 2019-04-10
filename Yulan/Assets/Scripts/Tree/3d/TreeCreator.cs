@@ -32,7 +32,7 @@ public class TreeCreator : MonoBehaviour
     tree.MakeTree(this.child, this.sprig);
 
 
-    tree.Shaking (wind);
+    tree.Shaking (wind, 3.0f);
     
     Debug.Log ("cam.right:"+this.cam.transform.right);
 
