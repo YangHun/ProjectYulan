@@ -2,6 +2,7 @@
 {
     Properties
     {
+      _Color ("Vertex Color", Color) = (1,1,1,1)
         _MainTex ("Texture", 2D) = "white" {}
     }
     SubShader
@@ -38,6 +39,7 @@
             };
 
             sampler2D _MainTex;
+            fixed4 _Color;
             float4 _MainTex_ST;
 
             v2f vert (appdata v)
@@ -54,7 +56,8 @@
             fixed4 frag (v2f i) : SV_Target
             {
                 // sample the texture
-                fixed4 col = tex2D(_MainTex, i.uv);  
+                //fixed4 col = tex2D(_MainTex, i.uv);  
+                fixed4 col = _Color;
                 col.a = ((i.fuv.x - 0.5)/2.0) * ((i.fuv.x - 0.5)/2.0) + ((i.fuv.y - 0.5)/2.0) + ((i.fuv.y - 0.5)/2.0);
                 if (col.a < 0) col.a = 0;
                 // apply fog
