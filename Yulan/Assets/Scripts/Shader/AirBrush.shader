@@ -46,7 +46,7 @@
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
-                o.fuv = normalize (v.vertex);
+                o.fuv = ((normalize((v.vertex)) )/2.0f) ;
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 UNITY_TRANSFER_FOG(o,o.vertex);
                 o.normal = UnityObjectToWorldNormal (v.normal);
@@ -58,7 +58,8 @@
                 // sample the texture
                 //fixed4 col = tex2D(_MainTex, i.uv);  
                 fixed4 col = _Color;
-                col.a = ((i.fuv.x - 0.5)/2.0) * ((i.fuv.x - 0.5)/2.0) + ((i.fuv.y - 0.5)/2.0) + ((i.fuv.y - 0.5)/2.0);
+                col.a = i.fuv.y * 2.0f;
+                //col.a = (((i.fuv.x - 0.5)/2.0) * ((i.fuv.x - 0.5)/2.0) + ((i.fuv.y - 0.5)/2.0) * ((i.fuv.y - 0.5)/2.0));
                 if (col.a < 0) col.a = 0;
                 // apply fog
                 UNITY_APPLY_FOG(i.fogCoord, col);
