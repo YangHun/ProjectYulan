@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,8 +21,16 @@ public class Branch : MonoBehaviour
 
   public float world_angle;
 
-  public Vector3[] smoothsteps;
+  protected Vector3[] _smoothsteps;
 
+  public Vector3[] smoothsteps {
+    get {
+      foreach (Vector3 i in _smoothsteps) {
+        transform.rotation * _smoothsteps;
+      } 
+      return _smoothsteps; }
+    set { _smoothsteps = value; }
+  }
 
   private Vector3 normal; //for trunk
 
@@ -55,11 +64,14 @@ public class Branch : MonoBehaviour
       b.weight *= (0.5f + Mathf.Pow (Mathf.Cos (Vector3.Angle (b.dir, b.tree.sun * (-1f)) / 2.0f * Mathf.PI / 180.0f), b.tree.sunIntensity ));
     }
     b.dir = b.dir.normalized * b.length * b.weight;
+    
+    
+    o.transform.position = b.pos;
+    o.transform.LookAt (b.pos + b.dir);
 
-    b.smoothsteps = b.CalcSmoothStep (ref b.smoothsteps, b.dir, b.parent.dir, 1);
+    b.smoothsteps = b.CalcSmoothStep (ref b.smoothsteps, b.transform.forward * b.dir.magnitude, b.parent.dir, 1);
     //this.dir = Quaternuion
 
-    o.transform.position = b.pos;
     o.name = string.Format ("{0}_{1}_branch",b.level, b.parent.child.Count);
 
     return b;
@@ -131,11 +143,13 @@ public class Branch : MonoBehaviour
     if (b.tree.sunIntensity > 0) {
       b.weight *= (0.5f + Mathf.Pow (Mathf.Cos (Vector3.Angle (b.dir, b.tree.sun * (-1f)) / 2.0f * Mathf.PI / 180.0f), b.tree.sunIntensity ));
     }
-
-    b.smoothsteps = new Vector3[b.tree.smoothstep + 1];
-    b.smoothsteps = b.CalcSmoothStep (ref b.smoothsteps, b.dir, b.normal, 1);
-
     o.transform.position = b.pos;
+    o.transform.LookAt (b.pos + b.dir);
+    
+    b.smoothsteps = new Vector3[b.tree.smoothstep + 1];
+    b.smoothsteps = b.CalcSmoothStep (ref b.smoothsteps, b.transform.forward * b.dir.magnitude, b.normal, 1);
+
+    
 
     return b;
   }

@@ -35,8 +35,11 @@ public class Sprig : Branch
     }
     s.dir = s.dir.normalized * s.length * s.weight;
 
-    s.smoothsteps = s.CalcSmoothStep (ref s.smoothsteps, s.dir, s.parent.dir, 1);
     o.transform.position = s.pos;
+    o.transform.LookAt (s.pos + s.dir);
+
+    
+    s.smoothsteps = s.CalcSmoothStep (ref s.smoothsteps, o.transform.forward * s.dir.magnitude, s.parent.dir, 1);
 
     o.name = string.Format ("{0}_{1}_sprig",s.level, s.parent.sprig.Count);
     return s;

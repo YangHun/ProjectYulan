@@ -33,9 +33,10 @@ public class YulanTree : MonoBehaviour
 
 
 
-  #region Messages
+  #region Functions
 
   public void Shaking(Transform wind, float time, float intensity = 1) {
+    return;
     this.wind = wind;
     this.shaking = StartCoroutine (ShakeTree(time, intensity));
   }
@@ -152,10 +153,11 @@ public class YulanTree : MonoBehaviour
     for (int i = 0; i < this.branches.Count; i++){
       
       this.RenderSmoothStep (this.branches[i], cam, w * 2 );            
+      
       /*
       GL.Color (this.branches[i].color);
-      Vector3 src = (Vector3)(this.worldTransform.localToWorldMatrix * (this.branches[i].pos)) + this.worldTransform.position;
-      Vector3 dst = (Vector3)(this.worldTransform.localToWorldMatrix * (this.branches[i].dir)) + src ;
+      Vector3 src = this.branches[i].transform.position;
+      Vector3 dst = this.branches[i].transform.position + this.branches[i].transform.forward * this.branches[i].dir.magnitude;
       Vector3 width = Quaternion.AngleAxis(90.0f, cam.transform.forward) * Vector3.ProjectOnPlane (dst - src, cam.transform.forward).normalized * w;
 
       GL.Vertex3 (src.x - width.x, src.y - width.y , src.z - width.z);
@@ -183,14 +185,16 @@ public class YulanTree : MonoBehaviour
 
   private void RenderSmoothStep (Branch b, Camera cam, float w) {
     Vector3 src = b.transform.position;
-    Vector3 dst = (b.transform.rotation * b.dir) + src ;
+    Vector3 dst = b.transform.position + b.transform.forward * b.dir.magnitude;
 
     float start = b.weight * w * (1 - ((float)b.level / (this.intensity+2) ) ) ;
     float end = b.weight * w * (1 - ((float)(b.level + 1) / (this.intensity+2) ));;
 
     for (int i = 1; i < b.smoothsteps.Length; i++) {
-      Vector3 s = src + b.transform.rotation *(Vector3)(this.transform.localToWorldMatrix * (b.smoothsteps[i - 1]));
-      Vector3 d = src + b.transform.rotation *(Vector3)(this.transform.localToWorldMatrix * (b.smoothsteps[i]));
+      Vector3 s = src + b.transform.rotation * b.smoothsteps [i-1];
+      Vector3 d = src + b.transform.rotation * b.smoothsteps [i];
+     // Vector3 s = (src + b.transform.rotation * (Vector3)(b.transform.localToWorldMatrix * b.smoothsteps[i - 1]));
+     // Vector3 d = (src + b.transform.rotation * (Vector3)(b.transform.localToWorldMatrix * b.smoothsteps[i]));
 
       Vector3 width = Quaternion.AngleAxis(90.0f, cam.transform.forward) * Vector3.ProjectOnPlane ( d - s , cam.transform.forward).normalized; 
       
