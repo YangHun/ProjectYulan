@@ -39,7 +39,7 @@ public class Sprig : Branch
     o.transform.LookAt (s.pos + s.dir);
 
     
-    s.smoothsteps = s.CalcSmoothStep (ref s.smoothsteps, o.transform.forward * s.dir.magnitude, s.parent.dir, 1);
+    s.smoothsteps = s.CalcSmoothStep (ref s.smoothsteps, Vector3.forward * s.dir.magnitude, s.parent.dir, 1);
 
     o.name = string.Format ("{0}_{1}_sprig",s.level, s.parent.sprig.Count);
     return s;

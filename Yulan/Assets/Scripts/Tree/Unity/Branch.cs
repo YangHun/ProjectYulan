@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -21,19 +20,26 @@ public class Branch : MonoBehaviour
 
   public float world_angle;
 
-  protected Vector3[] _smoothsteps;
+  public Vector3[] smoothsteps;
 
-  public Vector3[] smoothsteps {
-    get {
-      foreach (Vector3 i in _smoothsteps) {
-        transform.rotation * _smoothsteps;
-      } 
-      return _smoothsteps; }
-    set { _smoothsteps = value; }
-  }
 
   private Vector3 normal; //for trunk
 
+  public void Render (Camera cam, float w) {
+    GL.Begin (GL.QUADS);
+    GL.Color (this.color);    
+
+    Vector3 src = this.transform.position;
+    Vector3 dst = this.transform.position + this.transform.forward * this.dir.magnitude;
+    Vector3 width = Quaternion.AngleAxis(90.0f, cam.transform.forward) * Vector3.ProjectOnPlane (dst - src, cam.transform.forward).normalized * w;
+
+    GL.Vertex3 (src.x - width.x, src.y - width.y , src.z - width.z);
+    GL.Vertex3 (dst.x - width.x, dst.y - width.y , dst.z - width.z);
+    GL.Vertex3 (dst.x + width.x, dst.y + width.y , dst.z + width.z);
+    GL.Vertex3 (src.x + width.x, src.y + width.y , src.z + width.z);
+    
+    GL.End();
+  }
 
   public static Branch Create (Branch parent, int childcount, float weight) {
     
@@ -69,10 +75,11 @@ public class Branch : MonoBehaviour
     o.transform.position = b.pos;
     o.transform.LookAt (b.pos + b.dir);
 
-    b.smoothsteps = b.CalcSmoothStep (ref b.smoothsteps, b.transform.forward * b.dir.magnitude, b.parent.dir, 1);
+    b.smoothsteps = b.CalcSmoothStep (ref b.smoothsteps, Vector3.forward * b.dir.magnitude, b.parent.dir, 1);
     //this.dir = Quaternuion
 
     o.name = string.Format ("{0}_{1}_branch",b.level, b.parent.child.Count);
+
 
     return b;
 
@@ -87,6 +94,8 @@ public class Branch : MonoBehaviour
     return Mathf.Infinity * (-1);
   }
 
+
+  //Calculate local smoothstep, so dir must always be Vector3.forward.
   protected Vector3[] CalcSmoothStep (ref Vector3[] array, Vector3 dir, Vector3 normal, int smoothstep) {
     Vector3 alpha = dir.magnitude * Mathf.Cos (Vector3.Angle(dir, normal)) * normal;
     Vector3 beta = dir - alpha;
@@ -147,9 +156,9 @@ public class Branch : MonoBehaviour
     o.transform.LookAt (b.pos + b.dir);
     
     b.smoothsteps = new Vector3[b.tree.smoothstep + 1];
-    b.smoothsteps = b.CalcSmoothStep (ref b.smoothsteps, b.transform.forward * b.dir.magnitude, b.normal, 1);
+    b.smoothsteps = b.CalcSmoothStep (ref b.smoothsteps, Vector3.forward, b.normal, 1);
 
-    
+
 
     return b;
   }

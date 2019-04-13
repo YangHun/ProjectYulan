@@ -149,11 +149,12 @@ public class YulanTree : MonoBehaviour
     GL.PushMatrix();
     GL.Begin (GL.QUADS);
 
-    
     for (int i = 0; i < this.branches.Count; i++){
       
       this.RenderSmoothStep (this.branches[i], cam, w * 2 );            
       
+      //this.branches[i].Render(cam,w);
+
       /*
       GL.Color (this.branches[i].color);
       Vector3 src = this.branches[i].transform.position;
@@ -166,7 +167,6 @@ public class YulanTree : MonoBehaviour
       GL.Vertex3 (src.x + width.x, src.y + width.y , src.z + width.z);
 */
     }
-    GL.End();
     //lines
     /*
         GL.Begin(GL.LINES);
@@ -179,13 +179,14 @@ public class YulanTree : MonoBehaviour
     }
     GL.End();
  */
- 
+    GL.End();
     GL.PopMatrix();
  }
 
   private void RenderSmoothStep (Branch b, Camera cam, float w) {
+    if (!b.gameObject.activeSelf) return;
+
     Vector3 src = b.transform.position;
-    Vector3 dst = b.transform.position + b.transform.forward * b.dir.magnitude;
 
     float start = b.weight * w * (1 - ((float)b.level / (this.intensity+2) ) ) ;
     float end = b.weight * w * (1 - ((float)(b.level + 1) / (this.intensity+2) ));;
@@ -193,8 +194,9 @@ public class YulanTree : MonoBehaviour
     for (int i = 1; i < b.smoothsteps.Length; i++) {
       Vector3 s = src + b.transform.rotation * b.smoothsteps [i-1];
       Vector3 d = src + b.transform.rotation * b.smoothsteps [i];
-     // Vector3 s = (src + b.transform.rotation * (Vector3)(b.transform.localToWorldMatrix * b.smoothsteps[i - 1]));
-     // Vector3 d = (src + b.transform.rotation * (Vector3)(b.transform.localToWorldMatrix * b.smoothsteps[i]));
+
+      //Vector3 s = (src + b.transform.rotation * (Vector3)(b.transform.localToWorldMatrix * b.smoothsteps[i - 1]));
+      //Vector3 d = (src + b.transform.rotation * (Vector3)(b.transform.localToWorldMatrix * b.smoothsteps[i]));
 
       Vector3 width = Quaternion.AngleAxis(90.0f, cam.transform.forward) * Vector3.ProjectOnPlane ( d - s , cam.transform.forward).normalized; 
       
