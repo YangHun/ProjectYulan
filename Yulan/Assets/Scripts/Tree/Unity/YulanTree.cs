@@ -36,7 +36,6 @@ public class YulanTree : MonoBehaviour
   #region Functions
 
   public void Shaking(Transform wind, float time, float intensity = 1) {
-    return;
     this.wind = wind;
     this.shaking = StartCoroutine (ShakeTree(time, intensity));
   }

@@ -75,7 +75,7 @@ public class Branch : MonoBehaviour
     o.transform.position = b.pos;
     o.transform.LookAt (b.pos + b.dir);
 
-    b.smoothsteps = b.CalcSmoothStep (ref b.smoothsteps, Vector3.forward * b.dir.magnitude, b.parent.dir, 1);
+    b.smoothsteps = b.CalcSmoothStep (ref b.smoothsteps, Quaternion.Inverse(b.transform.rotation)* b.dir, b.parent.dir, 1);
     //this.dir = Quaternuion
 
     o.name = string.Format ("{0}_{1}_branch",b.level, b.parent.child.Count);
@@ -95,7 +95,6 @@ public class Branch : MonoBehaviour
   }
 
 
-  //Calculate local smoothstep, so dir must always be Vector3.forward.
   protected Vector3[] CalcSmoothStep (ref Vector3[] array, Vector3 dir, Vector3 normal, int smoothstep) {
     Vector3 alpha = dir.magnitude * Mathf.Cos (Vector3.Angle(dir, normal)) * normal;
     Vector3 beta = dir - alpha;

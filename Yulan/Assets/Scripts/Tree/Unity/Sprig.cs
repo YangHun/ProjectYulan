@@ -17,11 +17,11 @@ public class Sprig : Branch
     s.angle = parent.angle * 2.0f;
     s.length = parent.length * 2.0f;
     s.tree = parent.tree;
-    s.color = Color.cyan;
+    s.color = Color.white;
 
     s.smoothsteps = new Vector3[s.tree.smoothstep];
     
-    s.pos = parent.pos + parent.smoothsteps [ (int) ( (float)(parent.sprig.Count + 1) / (childcount + 1) * (parent.smoothsteps.Length) ) ];
+    s.pos = parent.pos + parent.transform.rotation * parent.smoothsteps [ (int) ( (float)(parent.sprig.Count + 1) / (childcount + 1) * (parent.smoothsteps.Length) ) ];
 
     
     s.dir = parent.dir;
@@ -39,7 +39,7 @@ public class Sprig : Branch
     o.transform.LookAt (s.pos + s.dir);
 
     
-    s.smoothsteps = s.CalcSmoothStep (ref s.smoothsteps, Vector3.forward * s.dir.magnitude, s.parent.dir, 1);
+    s.smoothsteps = s.CalcSmoothStep (ref s.smoothsteps, Quaternion.Inverse(s.transform.rotation)* s.dir, s.parent.dir, 1);
 
     o.name = string.Format ("{0}_{1}_sprig",s.level, s.parent.sprig.Count);
     return s;
