@@ -25,22 +25,42 @@ public class Branch : MonoBehaviour
 
   private Vector3 normal; //for trunk
 
-  public void Render (Camera cam, float w) {
-    GL.Begin (GL.QUADS);
-    GL.Color (this.color);    
 
-    Vector3 src = this.transform.position;
-    Vector3 dst = this.transform.position + this.transform.forward * this.dir.magnitude;
-    Vector3 width = Quaternion.AngleAxis(90.0f, cam.transform.forward) * Vector3.ProjectOnPlane (dst - src, cam.transform.forward).normalized * w;
 
-    GL.Vertex3 (src.x - width.x, src.y - width.y , src.z - width.z);
-    GL.Vertex3 (dst.x - width.x, dst.y - width.y , dst.z - width.z);
-    GL.Vertex3 (dst.x + width.x, dst.y + width.y , dst.z + width.z);
-    GL.Vertex3 (src.x + width.x, src.y + width.y , src.z + width.z);
-    
-    GL.End();
+#region function
+  private float shaketimer;
+  private bool shaking;
+  public void Shake (Transform dir, float duration, float intensity) {
+    if (shaking) StopAllCoroutines ();
+    StartCoroutine (_Shake(dir, 1.0f, 1.0f));
+
   }
+  private IEnumerator _Shake (Transform wind, float duration, float intensity) {
+    if (!this.shaking) this.shaketimer = 0.0f;
+    this.shaking = true;
+    float angle = 30.0f;
+    while (shaketimer < duration) {
+      
+      shaketimer += Time.fixedDeltaTime;
 
+
+      this.transform.Rotate (wind.right, angle / 2.0f / duration * Time.fixedDeltaTime * (this.shaketimer > duration / 2.0f? -1 : 1) );
+
+      
+      yield return null;
+    }
+    yield return null;
+
+    // if end
+    this.shaketimer = 0.0f;
+    this.shaking = false;
+  }
+  
+#endregion
+
+
+
+#region create and render
   public static Branch Create (Branch parent, int childcount, float weight) {
     
     GameObject o = new GameObject ();
@@ -75,8 +95,12 @@ public class Branch : MonoBehaviour
     o.transform.position = b.pos;
     o.transform.LookAt (b.pos + b.dir);
 
-    b.smoothsteps = b.CalcSmoothStep (ref b.smoothsteps, Quaternion.Inverse(b.transform.rotation)* b.dir, b.parent.dir, 1);
+    b.smoothsteps = b.CalcSmoothStep (ref b.smoothsteps, b.transform.worldToLocalMatrix * b.transform.forward * b.dir.magnitude, b.parent.dir, 1);
     //this.dir = Quaternuion
+
+
+    b.AddCollider(b);
+
 
     o.name = string.Format ("{0}_{1}_branch",b.level, b.parent.child.Count);
 
@@ -127,6 +151,12 @@ public class Branch : MonoBehaviour
     return result.normalized;
   }
 
+  protected void AddCollider (Branch b) {
+    BoxCollider collider = b.gameObject.AddComponent<BoxCollider>();
+    collider.center = Vector3.forward * b.length * b.weight / 2.0f;
+    collider.size = new Vector3 ( 0.05f, 0.05f, b.length * b.weight);
+  }
+
   // trunk
   public static Branch Create (YulanTree tree, Vector3 direction, float length, float angle, Vector3 normal) {
     
@@ -161,5 +191,6 @@ public class Branch : MonoBehaviour
 
     return b;
   }
+#endregion
 }
 }

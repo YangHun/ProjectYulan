@@ -39,9 +39,11 @@ public class Sprig : Branch
     o.transform.LookAt (s.pos + s.dir);
 
     
-    s.smoothsteps = s.CalcSmoothStep (ref s.smoothsteps, Quaternion.Inverse(s.transform.rotation)* s.dir, s.parent.dir, 1);
+    s.smoothsteps = s.CalcSmoothStep (ref s.smoothsteps, s.transform.worldToLocalMatrix * s.transform.forward * s.dir.magnitude, s.parent.dir, 1);
 
     o.name = string.Format ("{0}_{1}_sprig",s.level, s.parent.sprig.Count);
+    s.AddCollider(s);
+
     return s;
   }
 

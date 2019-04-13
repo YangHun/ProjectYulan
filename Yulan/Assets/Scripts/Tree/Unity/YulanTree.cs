@@ -43,7 +43,7 @@ public class YulanTree : MonoBehaviour
   private IEnumerator ShakeTree(float duration, float intensity = 1) {
     float timer = 0.0f;
     float angle = Vector3.Angle (wind.forward, this.root.dir);
-    angle = Mathf.Sin (angle) * intensity;
+    angle = Mathf.Sin (angle / 180.0f * Mathf.PI) * intensity;
     while (true) {
       if (timer > duration) timer = 0.0f;
       
@@ -181,7 +181,7 @@ public class YulanTree : MonoBehaviour
     GL.End();
     GL.PopMatrix();
  }
-
+  
   private void RenderSmoothStep (Branch b, Camera cam, float w) {
     if (!b.gameObject.activeSelf) return;
 
