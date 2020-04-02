@@ -28,6 +28,7 @@ public class YulanTree : MonoBehaviour
   protected Coroutine shaking;
   protected WaitForSeconds wait = new WaitForSeconds (1.0f);
 
+  public Sprite leaf;
 
   
 
@@ -67,7 +68,7 @@ public class YulanTree : MonoBehaviour
 
 
   #region Creation and Rendering
-  public static YulanTree Create (Transform parent, Vector3 start, int intensity, float length, float angle, int smoothstep, Transform cam, Vector3 sun, float sunIntensity) {
+  public static YulanTree Create (Transform parent, Vector3 start, int intensity, float length, float angle, int smoothstep, Transform cam, Vector3 sun, float sunIntensity, Sprite leaf) {
     
     GameObject o = new GameObject("YulanTree");
     o.transform.SetParent (parent, false);
@@ -85,6 +86,8 @@ public class YulanTree : MonoBehaviour
     yulan.smoothstep = smoothstep;
 
     yulan.root = Branch.Create(yulan, parent.transform.up, length, angle, cam.right);
+    yulan.leaf = leaf;
+
     yulan.branches.Add(yulan.root);
 
     yulan.top = start;
@@ -107,11 +110,22 @@ public class YulanTree : MonoBehaviour
       this.branches.Add (b);
 
       if ((b.pos + b.dir).y > this.top.y) this.top = b.pos + b.dir; 
+      
+      //if (b.level == this.intensity) LeafBud.Create(b, b.pos + b.dir, 0f, this.leaf);
+      if (b.level > 2) this.Leafing (b);
 
       if (b.level > 0) this.Sprigging (b, w, childcount, sprigcount);
       Branching (b, childcount, sprigcount);
     }
 
+  }
+
+  private void Leafing (Branch b, int leafcount = 3) {
+    for (int i = 0; i < leafcount; i++) {
+      LeafBud l = LeafBud.Create(b,
+                                 b.transform.position + b.transform.rotation * b.smoothsteps [ (int) ( b.smoothsteps.Length * (float)(i+1) /(leafcount + 1) ) ],
+                                 30.0f * ((i%2 == 0? 1 : (-1))), this.leaf);
+    }
   }
 
   private void Sprigging (Branch b, float weight, int childcount = 2, int sprigcount = 2) {
@@ -138,19 +152,20 @@ public class YulanTree : MonoBehaviour
     }
   }
 
-  public void RenderTree(Camera cam) {
-    
+  public void RenderTree(Camera cam, Material branch) {
     if (cam == null) return;
-
     float w = 0.025f;    
 
-
-    GL.PushMatrix();
+    branch.SetPass(0);
     GL.Begin (GL.QUADS);
 
-    for (int i = 0; i < this.branches.Count; i++){
-      
-      this.RenderSmoothStep (this.branches[i], cam, w * 2 );            
+    for (int i = 0; i < this.branches.Count; i++){      
+      this.RenderSmoothStep (this.branches[i], cam, w * 2 );
+       
+
+
+      //leaf.SetTexture("_MainTex",this.leaf.texture);      
+      //leaf.SetPass(0);
       
       //this.branches[i].Render(cam,w);
 
@@ -166,6 +181,7 @@ public class YulanTree : MonoBehaviour
       GL.Vertex3 (src.x + width.x, src.y + width.y , src.z + width.z);
 */
     }
+    GL.End();
     //lines
     /*
         GL.Begin(GL.LINES);
@@ -178,8 +194,34 @@ public class YulanTree : MonoBehaviour
     }
     GL.End();
  */
+ }
+
+public void RenderJoint (Camera cam, Material joint, Color col) {
+  joint.SetColor ("_Color", col);
+  joint.SetPass(0);
+
+  GL.Begin (GL.QUADS);
+float w = 0.025f;  
+  for (int i = 0; i < this.branches.Count; i++) {
+    this.RenderSmoothJoint (this.branches[i], cam, w * 2);
+  }
+
+  GL.End();
+}
+ public void RenderLeaf(Material leaf, Texture tex, Color col) {
+  leaf.SetColor ("_Color", col);
+  leaf.SetTexture("_MainTex", tex);
+  leaf.SetPass(0);
+    GL.Begin (GL.QUADS);
+   
+  for (int i = 0; i < this.branches.Count; i++) {
+
+     foreach (LeafBud l in this.branches[i].leaf) {
+      l.RenderLeaf();
+    }    
+    
+  } 
     GL.End();
-    GL.PopMatrix();
  }
   
   private void RenderSmoothStep (Branch b, Camera cam, float w) {
@@ -216,6 +258,43 @@ public class YulanTree : MonoBehaviour
       GL.Vertex3 (s.x + width.x * Mathf.Lerp (start, end, (float) (i) / b.smoothsteps.Length),
                   s.y + width.y * Mathf.Lerp (start, end, (float) (i) / b.smoothsteps.Length),
                   s.z + width.z * Mathf.Lerp (start, end, (float) (i) / b.smoothsteps.Length));
+    }
+    
+  }
+
+  private void RenderSmoothJoint (Branch b, Camera cam, float w) {
+    if (!b.gameObject.activeSelf) return;
+    if (b.level > this.intensity - 2) return;
+
+    Vector3 src = b.transform.position;
+    Vector3 dir = b.transform.forward;
+
+    float start = b.weight * w * (1 - ((float)b.level / (this.intensity+2) ) ) ;
+    float end = b.weight * w * (1 - ((float)(b.level + 1) / (this.intensity+2) ));;
+
+    for (int i = 1; i < b.smoothsteps.Length; i++) {
+      Vector3 s = src + b.transform.rotation * b.smoothsteps [i - 1];
+      float weight = Mathf.Lerp (start, end, (float) (i) / b.smoothsteps.Length);
+      Vector3 width = cam.transform.right * weight;
+      Vector3 height = cam.transform.up * weight;
+      
+      Color c = b.color;
+      //Color c = b.color - (Color.blue) * ((float)i/level);
+      //c.a = 1.0f;
+      GL.Color (c);
+      
+      
+      GL.TexCoord2(0.0f, 0.0f);
+      GL.Vertex3 (s.x - width.x - height.x, s.y - width.y - height.y, s.z - width.z - height.z);
+
+      GL.TexCoord2(0.0f, 1.0f);
+      GL.Vertex3 (s.x - width.x + height.x, s.y - width.y + height.y, s.z - width.z + height.z);
+      
+      GL.TexCoord2(1.0f, 1.0f);
+      GL.Vertex3 (s.x + width.x + height.x, s.y + width.y + height.y, s.z + width.z + height.z);
+      
+      GL.TexCoord2(1.0f, 0.0f);
+      GL.Vertex3 (s.x + width.x - height.x, s.y + width.y - height.y, s.z + width.z - height.z);
     }
     
   }

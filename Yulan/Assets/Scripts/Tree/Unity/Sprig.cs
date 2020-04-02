@@ -14,6 +14,7 @@ public class Sprig : Branch
     s.parent = parent;
     s.level = parent.level + 2;
     s.child = new List<Branch>();
+    s.leaf = new List<LeafBud>();
     s.angle = parent.angle * 2.0f;
     s.length = parent.length * 2.0f;
     s.tree = parent.tree;

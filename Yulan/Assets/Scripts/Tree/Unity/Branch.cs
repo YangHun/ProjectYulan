@@ -10,6 +10,8 @@ public class Branch : MonoBehaviour
   public YulanTree tree;
   public List <Branch> child;
   public List <Branch> sprig;
+
+  public List <LeafBud> leaf;
   public Vector3 pos;
   public Vector3 dir;
   public Color color;
@@ -71,6 +73,7 @@ public class Branch : MonoBehaviour
     b.level = parent.level + 1;
     b.child = new List<Branch>();
     b.sprig = new List<Branch>();
+    b.leaf = new List<LeafBud>();
     b.angle = parent.angle;
     b.length = parent.length;
     b.tree = parent.tree;
@@ -169,6 +172,7 @@ public class Branch : MonoBehaviour
     b.parent = null;
     b.child = new List<Branch>();
     b.sprig = new List<Branch>();
+    b.leaf = new List<LeafBud>();
     b.pos = tree.transform.position;
     b.dir = direction;
     b.length = length;

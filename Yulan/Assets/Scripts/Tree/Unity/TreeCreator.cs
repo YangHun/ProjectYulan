@@ -15,6 +15,9 @@ public class TreeCreator : MonoBehaviour
 
   public Material mat;
 
+  public Material leaf_mat;
+  public Material joint_mat;
+
   public Camera cam;
 
   public Transform sun;
@@ -22,12 +25,14 @@ public class TreeCreator : MonoBehaviour
 
   public Transform wind;
 
+  public Sprite leaf;
+
   YulanTree tree;
 
   // Start is called before the first frame update
   void Start()
   {
-    tree = YulanTree.Create(this.transform, Vector3.zero, this.intensity, this.length, this.angle, 7, this.cam.transform, this.sun.forward, this.sunIntensity);
+    tree = YulanTree.Create(this.transform, Vector3.zero, this.intensity, this.length, this.angle, 7, this.cam.transform, this.sun.forward, this.sunIntensity, this.leaf);
 
     tree.MakeTree(this.child, this.sprig);
 
@@ -42,12 +47,21 @@ public class TreeCreator : MonoBehaviour
 
   void OnRenderObject() {
     if (tree==null) return;
-    mat.SetPass(0);
     
+    
+    
+    
+    GL.PushMatrix();
     //GL.MultMatrix (transform.localToWorldMatrix);
-    tree.RenderTree(this.cam);
-    //if (showFlower) tree.RenderFlower();
+    tree.RenderTree(this.cam, this.mat);
     
+    tree.RenderJoint(this.cam, this.joint_mat, this.mat.GetColor("_Color"));
+
+    tree.RenderLeaf (this.leaf_mat, leaf.texture, Color.white);
+
+     //if (showFlower) tree.RenderFlower();
+    
+    GL.PopMatrix();
     
   }
 }
