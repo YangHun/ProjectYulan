@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.43749, g: 0.48531115, b: 0.565586, a: 1}
+  m_IndirectSpecularColor: {r: 0.43749025, g: 0.48531145, b: 0.5655863, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -315,7 +315,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 466533411}
+  m_TargetGraphic: {fileID: 0}
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
@@ -333,15 +333,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef8b96895a0ec4ba685178a052544251, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: cba97e819e6d7024daa1e2c5c7b376cc, type: 3}
 --- !u!222 &466533412
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -566,7 +557,7 @@ MonoBehaviour:
   camOverzoomMargin: 1
   camOverdragMargin: 1
   boundaryMin: {x: -4, y: -2}
-  boundaryMax: {x: 4, y: 8}
+  boundaryMax: {x: 4, y: 20}
   camFollowFactor: 15
   autoScrollDampMode: 0
   autoScrollDamp: 300
