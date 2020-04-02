@@ -9,16 +9,18 @@ public class YulanTree {
   public int intensity;
   public float angle;
   public float length;
+  public int sprig;
 
   public Branch root;
   public List<Branch> branches = new List<Branch>();
 
-  public YulanTree (Vector3 start, int intensity, float length, float angle, Vector4 sunlight, float sun_intensity) {
+  public YulanTree (Vector3 start, int intensity, float length, float angle, Vector4 sunlight, float sun_intensity, int sprig) {
     this.length = length;
     this.angle = angle;
     this.intensity = intensity;
     this.light = new Vector4 (sunlight.x, sunlight.y, sunlight.z, sun_intensity);
     this.root = new Branch (this, start, length, angle);
+    this.sprig = sprig;
     this.branches.Add(root);
     //this.nodes = 1;
   }
@@ -38,7 +40,7 @@ public class YulanTree {
       //b.tree.nodes += 1;
       parent.child.Add (b);
       branches.Add(b);
-      if (b.level > this.intensity / 4.0f) this.Sprigging (b, 2, this.intensity - b.level);
+      if (b.level > this.intensity / 4.0f) this.Sprigging (b, sprig, this.intensity - b.level);
       Branching (b, branches, childcount, complete);
       //Debug.LogFormat("branch {0}_{1} is created", b.level, parent.child.Count);
     }

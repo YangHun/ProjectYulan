@@ -32,18 +32,26 @@ public class TreeCreator : MonoBehaviour
   // Start is called before the first frame update
   void Start()
   {
-    tree = YulanTree.Create(this.transform, Vector3.zero, this.intensity, this.length, this.angle, 7, this.cam.transform, this.sun.forward, this.sunIntensity, this.leaf);
-
-    tree.MakeTree(this.child, this.sprig);
-
-
-    tree.Shaking (wind, 0.5f, 50f);
     
-    Debug.Log ("cam.right:"+this.cam.transform.right);
 
     //StartCoroutine (tree.RenderLine(this.transform, mat));
 
   }
+
+    public void Generate()
+    {
+        if (tree != null) Destroy(tree.gameObject);
+
+        tree = YulanTree.Create(this.transform, Vector3.zero, this.intensity, this.length, this.angle, 7, this.cam.transform, this.sun.forward, this.sunIntensity, this.leaf);
+
+        tree.MakeTree(this.child, this.sprig);
+
+
+        tree.Shaking(wind, 0.5f, 50f);
+
+        Debug.Log("cam.right:" + this.cam.transform.right);
+    }
+
 
   void OnRenderObject() {
     if (tree==null) return;

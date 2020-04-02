@@ -255,7 +255,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 4
+  orthographic size: 10
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -620,10 +620,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   intensity: 5
-  angle: 45
+  angle: 0
   length: 1
-  child: 3
-  sprig: 1
+  child: 1
+  sprig: 0
   mat: {fileID: 2100000, guid: 695f66bc2e8372d4eb5e81eda5284739, type: 2}
   cam: {fileID: 975937054}
   sun: {fileID: 1870754844}

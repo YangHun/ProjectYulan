@@ -12,6 +12,7 @@ public class TreeCreator : MonoBehaviour
   public int duration = 1;
   public float angle = 60.0f;
   public float width = 0.1f;
+  public int sprig = 2;
   public Material mat;
   private GameObject seed;
 
@@ -22,18 +23,11 @@ public class TreeCreator : MonoBehaviour
   public bool showFlower = false;
 
   void Awake() {
-    this.seed = new GameObject();
-    LineRenderer line = this.seed.AddComponent<LineRenderer>();
-    line.material = this.mat;
-    line.SetPosition(1, Vector3.up * duration);
-    line.useWorldSpace = false;
-    line.widthMultiplier = this.width;
-    this.seed.name = "Seed";
   }
 
   public void Generate()
   {
-    tree = new YulanTree(Vector3.up, intensity, duration, angle, this.sun.forward, this.sun_intensity);
+    tree = new YulanTree(Vector3.up, intensity, duration, angle, this.sun.forward, this.sun_intensity, this.sprig);
     //tree = new YulanTree(Vector3.up, intensity, duration, angle, Vector3.zero, 0.0f);
     tree.MakeCompleteTree();
   }
